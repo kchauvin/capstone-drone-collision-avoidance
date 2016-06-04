@@ -42,29 +42,8 @@ rectR = np.zeros((640,480,3),np.uint8)
 
 
 
-
-#test sliders for tuning SGBM
-# cv2.createTrackbar('minDisp*16','Depth Map',1,100,nothing)
-# cv2.createTrackbar('numDisp*16','Depth Map',1,100,nothing)
-# cv2.createTrackbar('UniquenessRatio','Depth Map',1,100,nothing)
-# cv2.createTrackbar('SpeckleWinSize','Depth Map',1,100,nothing)
-# cv2.createTrackbar('BlockSize','Depth Map',1,100,nothing)
-# cv2.setTrackbarPos('minDisp*16','Depth Map',1)
-# cv2.setTrackbarPos('numDisp*16','Depth Map',1)
-# cv2.setTrackbarPos('UniquenessRatio','Depth Map',1)
-# cv2.setTrackbarPos('SpeckleWinSize','Depth Map',1)
-# cv2.setTrackbarPos('BlockSize','Depth Map',1)
-
-#thresholding trackbar
-cv2.createTrackbar('Threshold','Depth Map',0,255,nothing)
-cv2.setTrackbarPos('Threshold','Depth Map',128)
-
-
 exec_time_sum = 0
 i = 0
-
-
-#contour detection
 
 
 while (True):
@@ -79,19 +58,13 @@ while (True):
     rectR = cv2.remap(frameR, undistMapR, rectMapR, cv2.INTER_LINEAR)
 
 
-    #~~~~ DEPTH MAP PART ~~~~~~~
     # convert rectified from RGB to 8 bit grayscale
     grayRectL = cv2.cvtColor(rectL, cv2.COLOR_BGR2GRAY)
     grayRectR = cv2.cvtColor(rectR, cv2.COLOR_BGR2GRAY)
     grayFrameL = cv2.cvtColor(frameL, cv2.COLOR_BGR2GRAY)
     grayFrameR = cv2.cvtColor(frameR, cv2.COLOR_BGR2GRAY)
 
-    #create depth map with sliders
-    min_disp= 16*cv2.getTrackbarPos('minDisp*16','Depth Map')
-    num_disp = 16*cv2.getTrackbarPos('numDisp*16','Depth Map')
-    blocksize = cv2.getTrackbarPos('BlockSize','Depth Map')
-    unique_ratio = cv2.getTrackbarPos('UniquenessRatio','Depth Map')
-    speckle_win_size = cv2.getTrackbarPos('SpeckleWinSize','Depth Map')
+    #create depth map
 
     window_size = 3
     min_disp = 16
@@ -112,13 +85,11 @@ while (True):
 
     disparity = stereo.compute(grayRectL,grayRectR).astype(np.float32)
     disparity = cv2.normalize(disparity, disparity, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8UC1)
-    #~~~~~~ END DEPTH MAP ~~~~~~~~
+
 
     #blur depth map to filter high frequency noise
-
     #disparity_gaussian = cv2.GaussianBlur(disparity,(9,9),0)
     disparity_blur = cv2.medianBlur(disparity,11)
-
 
     #thresholding depth map
     disparity_thresh_near = cv2.threshold(disparity_blur,170,255,cv2.THRESH_BINARY)[1]
@@ -132,14 +103,10 @@ while (True):
     #contours = cv2.findContours(disparity_thresh_imm, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[1]
     contours = cv2.findContours(disparity_edge, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[1]
 
-
-
-    #approximate contours to close them
-
-
     disparity_contours = np.zeros((480,640,3),np.uint8)
 
     min_box_size = 200 #pixels^2
+    quadrant_near_object = np.zeros((3,3), dtype=bool)
 
     for contour_index in contours:
         area = cv2.contourArea(contour_index)
@@ -151,6 +118,28 @@ while (True):
 
         if box_area > min_box_size:
             cv2.drawContours(disparity_contours, [box], 0, (0,255,0), 2)
+
+            #determine which quadrants the rectangle occupies
+            for i in range(0,1):
+                for j in range(0,1):
+                    if box[i][j] < (213,160):
+                        quadrant_near_object[0][0] = True
+                    elif (213,0) <= box[i][j] < (426,0):
+                        quadrant_near_object[1][0] = True
+                    elif (426,0) <= box[i][j] < (640,0):
+                        quadrant_near_object[2][0] = True
+                    elif (0,160) <= box[i][j] < (0,320):
+                        quadrant_near_object[0][1] = True
+                    elif (213,160) <= box[i][j] < (213,320):
+                        quadrant_near_object[1][1] = True
+                    elif (426,160) <= box[i][j] < (640,320):
+                        quadrant_near_object[2][1] = True
+                    elif (0,320) <= box[i][j] < (0,480):
+                        quadrant_near_object[0][1] = True
+                    elif (213,320) <= box[i][j] < (213,480):
+                        quadrant_near_object[1][1] = True
+                    elif (426,320) <= box[i][j] < (640,480):
+                        quadrant_near_object[2][1] = True
 
         # M  = cv2.moments(contours[i])
         # if (M['m00'] == 0):

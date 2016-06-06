@@ -1,26 +1,26 @@
 import cv2
 import sys
 import time
-from threading import Thread
+import threading
 import numpy as np
 from imutils.video import WebcamVideoStream
-import imutils
 
 from matplotlib import pyplot as plt
 
-def nothing(x):
-    pass
+#def nothing(x):
+#    pass
 
 
 class Stereo_Vision:
     """Class for obtaining and analyzing depth maps"""
 
-    def __init__(self, cam_L_src, cam_R_src):
+    def __init__(self, cam_L_src, cam_R_src, display_frames=True):
 
         #initialize camera feed threads
         self.capL = WebcamVideoStream(src=cam_L_src).start()
         self.capR = WebcamVideoStream(src=cam_R_src).start()
 
+        self.display_frames = display_frames
 
         # initialize windows
         self.WINDOW_L1 = 'undistorted left cam'
@@ -47,14 +47,9 @@ class Stereo_Vision:
         self.frame_counter = 0
         self.stop = False
 
-    def start(self, display_frames=True):
-        vision_thread = Thread(target=start_stereo, args=self,display_frames)
-        vision_thread.start()
-
-    def get_FPS(self):
-        self.exec_time_avg = self.exec_time_sum/self.frame_counter
-        self.fps_avg = 1.0/self.exec_time_avg
-        return self.fps_avg
+    def start(self):
+        self.vision_thread = Thread(target=start_stereo, args=self)
+        self.vision_thread.start()
 
     def stop(self):
         self.stop = True
@@ -63,10 +58,8 @@ class Stereo_Vision:
     def get_quadrants(self):
         return self.quadrant_near_object
 
-    def start_stereo(self, display_frames):
+    def start_stereo(self):
         while (self.stop != True):
-
-            self.start_time = time.time()
             self.frameL = capL.read()
             self.frameR = capR.read()
 
@@ -83,6 +76,14 @@ class Stereo_Vision:
             self.grayFrameR = cv2.cvtColor(selfframeR, cv2.COLOR_BGR2GRAY)
 
             #create depth map
+
+            self.object_left_column = True
+            self.object_mid_column = True
+            self.object_right_column = True
+            self.object_top_row = True
+            self.object_mid_row = True
+            self.object_bottom_row = True
+
 
             self.window_size = 3
             self.min_disp = 16
@@ -139,26 +140,27 @@ class Stereo_Vision:
                     cv2.drawContours(self.disparity_contours, [self.box], 0, (0,255,0), 2)
 
                     #determine which quadrants the rectangle occupies
-                    for self.i in range(0,1):
-                        for self.j in range(0,1):
-                            if self.box[i][j] < (213,160):
-                                self.quadrant_near_object[0][0] = True
-                            elif (213,0) <= box[i][j] < (426,0):
-                                self.quadrant_near_object[1][0] = True
-                            elif (426,0) <= box[i][j] < (640,0):
-                                self.quadrant_near_object[2][0] = True
-                            elif (0,160) <= box[i][j] < (0,320):
-                                self.quadrant_near_object[0][1] = True
-                            elif (213,160) <= box[i][j] < (213,320):
-                                self.quadrant_near_object[1][1] = True
-                            elif (426,160) <= box[i][j] < (640,320):
-                                self.quadrant_near_object[2][1] = True
-                            elif (0,320) <= box[i][j] < (0,480):
-                                self.quadrant_near_object[0][1] = True
-                            elif (213,320) <= box[i][j] < (213,480):
-                                self.quadrant_near_object[1][1] = True
-                            elif (426,320) <= box[i][j] < (640,480):
-                                self.quadrant_near_object[2][1] = True
+                    #NEED TO TEST THIS WITH THE CAMERAS
+                    for row_index in range(0,1):
+                        for col_index in range(0,1):
+                            self.col = self.box[row_index][col_index][0] / 214
+                            self.row = self.box[row_index][col_index][1] / 160
+                        if row == 3:
+                            row = 2
+
+            if (self.quadrant_near_object[0][0] == True or self.quadrant_near_object[0][1] == True or self.quadrant_near_object[0][2] == True):
+                object_left_column = True
+            if (self.quadrant_near_object[1][0] == True or self.quadrant_near_object[1][1] == True or self.quadrant_near_object[1][2] == True):
+                object_mid_column = True
+            if (self.quadrant_near_object[2][0] == True or self.quadrant_near_object[2][1] == True or self.quadrant_near_object[2][2] == True):
+                object_right_column = True
+            if (self.quadrant_near_object[0][0] == True or self.quadrant_near_object[1][0] == True or self.quadrant_near_object[2][0] == True):
+                object_top_row = True
+            if (self.quadrant_near_object[0][1] == True or self.quadrant_near_object[1][1] == True or self.quadrant_near_object[2][1] == True):
+                object_mid_row = True
+            if (self.quadrant_near_object[0][2] == True or self.quadrant_near_object[1][2] == True or self.quadrant_near_object[2][2] == True):
+                object_bottom_row = True
+
 
             if display_frames == True:
                 cv2.drawContours(self.disparity_contours, self.contours, -1, (180,105,255), -1)
@@ -166,18 +168,26 @@ class Stereo_Vision:
                 cv2.imshow('Depth Map', self.disparity)
                 cv2.imshow('Shapes', self.disparity_contours)
 
-
-
             if cv2.waitKey(1) & 0xFF == ord('q'):
-                capL.stop()
-                capR.stop()
+                self.capL.stop()
+                self.capR.stop()
                 break
 
-            end_time = time.time()
-            exec_time = end_time - start_time
-            exec_time_sum += exec_time
-            self.frame_counter += 1
-
-        capL.stop()
-        capR.stop()
+        self.capL.stop()
+        self.capR.stop()
         cv2.destroyAllWindows()
+
+
+
+SV = Stereo_Vision(1,0)
+
+SV.start()
+
+SV.stop()
+
+
+sonar = usonic(;llkadsf)
+sonar.start()
+
+
+print sonar.readings[0]

@@ -1,15 +1,9 @@
 import cv2
 import sys
 import time
-import threading
+from threading import Thread
 import numpy as np
 from imutils.video import WebcamVideoStream
-
-from matplotlib import pyplot as plt
-
-#def nothing(x):
-#    pass
-
 
 class Stereo_Vision:
     """Class for obtaining and analyzing depth maps"""
@@ -23,12 +17,10 @@ class Stereo_Vision:
         self.display_frames = display_frames
 
         # initialize windows
-        self.WINDOW_L1 = 'undistorted left cam'
-        self.WINDOW_R1 = 'undistorted right cam'
-        cv2.namedWindow('Depth Map')
-        cv2.namedWindow('Threshold')
-        cv2.namedWindow('Shapes')
-        cv2.namedWindow('Test')
+	if self.display_frames == True:
+             cv2.namedWindow('Depth Map')
+             cv2.namedWindow('Threshold')
+             cv2.namedWindow('Shapes')
 
 
         # import calibration matrices
@@ -42,13 +34,15 @@ class Stereo_Vision:
         self.rectL = np.zeros((640,480,3),np.uint8)
         self.rectR = np.zeros((640,480,3),np.uint8)
 
+	self.quadrant_near_object = np.zeros((3,3), dtype=bool)
 
         self.exec_time_sum = 0
         self.frame_counter = 0
         self.stop = False
+	self.fps = 0
 
     def start(self):
-        self.vision_thread = Thread(target=start_stereo, args=self)
+        self.vision_thread = Thread(target=self.start_stereo)
         self.vision_thread.start()
 
     def stop(self):
@@ -60,8 +54,10 @@ class Stereo_Vision:
 
     def start_stereo(self):
         while (self.stop != True):
-            self.frameL = capL.read()
-            self.frameR = capR.read()
+
+            self.start_time = time.time()
+            self.frameL = self.capL.read()
+            self.frameR = self.capR.read()
 
 
             #remap cameras to remove distortion
@@ -73,7 +69,7 @@ class Stereo_Vision:
             self.grayRectL = cv2.cvtColor(self.rectL, cv2.COLOR_BGR2GRAY)
             self.grayRectR = cv2.cvtColor(self.rectR, cv2.COLOR_BGR2GRAY)
             self.grayFrameL = cv2.cvtColor(self.frameL, cv2.COLOR_BGR2GRAY)
-            self.grayFrameR = cv2.cvtColor(selfframeR, cv2.COLOR_BGR2GRAY)
+            self.grayFrameR = cv2.cvtColor(self.frameR, cv2.COLOR_BGR2GRAY)
 
             #create depth map
 
@@ -84,25 +80,9 @@ class Stereo_Vision:
             self.object_mid_row = True
             self.object_bottom_row = True
 
+            self.stereo = cv2.StereoBM_create(numDisparities=0, blockSize=17)
 
-            self.window_size = 3
-            self.min_disp = 16
-            self.num_disp = 112 - min_disp
-            self.stereo = cv2.StereoSGBM_create(
-                minDisparity = self.min_disp,
-                numDisparities = self.num_disp,
-                blockSize = 27,
-                P1 = 8*3*self.window_size**2,
-                P2 = 32*3*self.window_size**2,
-                disp12MaxDiff = 10,
-                uniquenessRatio = 0,
-                speckleWindowSize = 0,
-                speckleRange = 0,
-                preFilterCap=0
-            )
-
-
-            self.disparity = stereo.compute(self.grayRectL,self.grayRectR).astype(np.float32)
+            self.disparity = self.stereo.compute(self.grayRectL,self.grayRectR).astype(np.float32)
             self.disparity = cv2.normalize(self.disparity, self.disparity, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8UC1)
 
 
@@ -113,7 +93,7 @@ class Stereo_Vision:
             #thresholding depth map
             self.disparity_thresh_near = cv2.threshold(self.disparity_blur,170,255,cv2.THRESH_BINARY)[1]
             self.disparity_thresh_imm = cv2.threshold(self.disparity_blur,180,255,cv2.THRESH_BINARY)[1]
-            disparity_thresh_near = cv2.subtract(self.disparity_thresh_near, self.disparity_thresh_imm)
+            self.disparity_thresh_near = cv2.subtract(self.disparity_thresh_near, self.disparity_thresh_imm)
 
 
             self.disparity_edge = cv2.Canny(self.disparity_thresh_imm,100,200)
@@ -124,7 +104,7 @@ class Stereo_Vision:
 
             self.disparity_contours = np.zeros((480,640,3),np.uint8)
 
-            self.min_box_size = 200 #pixels^2
+            self.min_box_size = 600 #pixels^2
             self.quadrant_near_object = np.zeros((3,3), dtype=bool)
 
             for self.contour_index in self.contours:
@@ -133,20 +113,20 @@ class Stereo_Vision:
                 self.rect = cv2.minAreaRect(self.contour_index)
                 self.box = cv2.boxPoints(self.rect)
                 #this needs to be fixed
-                self.box_area = abs((self.box[0][0] - self.box[1][0]) * (self.box[0][1] - self.box[1][1]))
+                self.box_area = abs((self.box[3][0] - self.box[0][0])) * abs((self.box[3][1] - self.box[0][1]))
                 self.box = np.int0(self.box)
 
                 if self.box_area > self.min_box_size:
                     cv2.drawContours(self.disparity_contours, [self.box], 0, (0,255,0), 2)
 
                     #determine which quadrants the rectangle occupies
-                    #NEED TO TEST THIS WITH THE CAMERAS
-                    for row_index in range(0,1):
-                        for col_index in range(0,1):
-                            self.col = self.box[row_index][col_index][0] / 214
-                            self.row = self.box[row_index][col_index][1] / 160
-                        if row == 3:
-                            row = 2
+                    for corner_index in range(0,3):
+                        self.col = self.box[corner_index][0] / 214 # x coordinates
+                        self.row = self.box[corner_index][1] / 160 # y coordinates
+                        if self.row == 3:
+                            self.row= 2
+                        self.quadrant_near_object[self.row][self.col] = True
+
 
             if (self.quadrant_near_object[0][0] == True or self.quadrant_near_object[0][1] == True or self.quadrant_near_object[0][2] == True):
                 object_left_column = True
@@ -161,8 +141,13 @@ class Stereo_Vision:
             if (self.quadrant_near_object[0][2] == True or self.quadrant_near_object[1][2] == True or self.quadrant_near_object[2][2] == True):
                 object_bottom_row = True
 
+            self.end_time = time.time()
+            self.exec_time = self.end_time - self.start_time
+            self.exec_time_sum += self.exec_time
+            self.frame_counter += 1
+            self.fps = 1.0 / self.exec_time
 
-            if display_frames == True:
+            if self.display_frames == True:
                 cv2.drawContours(self.disparity_contours, self.contours, -1, (180,105,255), -1)
                 cv2.imshow('Threshold', self.disparity_thresh_imm)
                 cv2.imshow('Depth Map', self.disparity)
@@ -173,21 +158,10 @@ class Stereo_Vision:
                 self.capR.stop()
                 break
 
+
+
         self.capL.stop()
         self.capR.stop()
         cv2.destroyAllWindows()
 
 
-
-SV = Stereo_Vision(1,0)
-
-SV.start()
-
-SV.stop()
-
-
-sonar = usonic(;llkadsf)
-sonar.start()
-
-
-print sonar.readings[0]

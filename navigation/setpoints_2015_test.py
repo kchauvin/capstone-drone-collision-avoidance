@@ -53,7 +53,7 @@ class Setpoint:
 
             rate.sleep()
 
-    def set(self, x, y, z, yaw, delay=0, wait=False):
+    def set(self, x, y, z, yaw, delay=0, wait=True):
         self.done = False
         self.x = x
         self.y = y
@@ -103,6 +103,7 @@ rate = rospy.Rate(10)
 setpoint = Setpoint(pub, rospy)
 
 #setpoint.pitch(50,0)
+#print "done"
 #setpoint.home()
 #setpoint.roll(50,0)
 

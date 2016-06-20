@@ -5,7 +5,7 @@ import numpy as np
 from imutils.video import WebcamVideoStream
 import imutils
 
-from matplotlib import pyplot as plt
+#from matplotlib import pyplot as plt
 
 def nothing(x):
     pass
@@ -19,12 +19,12 @@ capR = WebcamVideoStream(src=0).start()
 
 
 # initialize windows
-WINDOW_L1 = 'undistorted left cam'
-WINDOW_R1 = 'undistorted right cam'
+#WINDOW_L1 = 'undistorted left cam'
+#WINDOW_R1 = 'undistorted right cam'
 cv2.namedWindow('Depth Map')
-cv2.namedWindow('Threshold')
-cv2.namedWindow('Shapes')
-cv2.namedWindow('Test')
+#cv2.namedWindow('Threshold')
+#cv2.namedWindow('Shapes')
+#cv2.namedWindow('Test')
 
 
 
@@ -56,8 +56,8 @@ rectR = np.zeros((640,480,3),np.uint8)
 # cv2.setTrackbarPos('BlockSize','Depth Map',1)
 
 #thresholding trackbar
-cv2.createTrackbar('Threshold','Depth Map',0,255,nothing)
-cv2.setTrackbarPos('Threshold','Depth Map',128)
+#cv2.createTrackbar('Threshold','Depth Map',0,255,nothing)
+#cv2.setTrackbarPos('Threshold','Depth Map',128)
 
 
 exec_time_sum = 0
@@ -175,9 +175,9 @@ while (True):
     #cv2.imshow(WINDOW_R, frameR)
     #cv2.imshow(WINDOW_L1, rectL)
     #cv2.imshow(WINDOW_R1, rectR)
-    cv2.imshow('Threshold', disparity_thresh_imm)
+    #cv2.imshow('Threshold', disparity_thresh_imm)
     cv2.imshow('Depth Map', disparity)
-    cv2.imshow('Shapes', disparity_contours)
+    #cv2.imshow('Shapes', disparity_contours)
     #cv2.imshow('Test', disparity_gaussian)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):

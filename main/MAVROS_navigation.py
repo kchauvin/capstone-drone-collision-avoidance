@@ -22,9 +22,7 @@ class Setpoint:
         self.x = 0.0
         self.y = 0.0
         self.z = 0.0
-        self.curr_x = 0.0
-        self.curr_y = 0.0
-        self.curr_z = 0.0
+
         self.yaw = 0.0
 
         # publisher for mavros/setpoint_position/local
@@ -33,28 +31,32 @@ class Setpoint:
         self.sub = rospy.Subscriber(mavros.get_topic('local_position', 'pose'),
                                     SP.PoseStamped, self.reached)
 
+        try:
+            thread.start_new_thread( self.navigate, () )
+        except:
+            print "Error: Unable to start thread"
+                                    
+                                    
         #self.sonar_readings = sonar_readings
         self.obs_detected = False
-
+        
+        #current coordinates
+        self.curr_x = 0.0
+        self.curr_y = 0.0
+        self.curr_z = 0.0
+        
         #coordinates for original setpoint, stored to continue to desired setpoint if interrupted
         self.x_final_dest = 0.0
         self.y_final_dest = 0.0
         self.z_final_dest = 0.0
         self.yaw_final_dest = 0.0
 
-        try:
-            thread.start_new_thread( self.navigate, () )
-        except:
-            print "Error: Unable to start thread"
-
         self.done = False
         self.done_evt = threading.Event()
-        #self.sub = rospy.Subscriber(mavros.get_topic('local_position', 'pose'), SP.PoseStamped, self.reached)
 
     def navigate(self):
         rate = rospy.Rate(10) # 10hz
 
-        #msg = PoseStamped()
         msg = SP.PoseStamped(
             header=SP.Header(
                 frame_id="base_footprint",  # no matter, plugin don't use TF
@@ -65,8 +67,6 @@ class Setpoint:
         #msg.header.stamp = rospy.Time.now()
 
         while 1:
-
-
             #print self.curr_x, self.curr_y, self.curr_z
             quaternion = quaternion_from_euler(0,0,radians(self.yaw))
             msg.pose.position.x = self.x
@@ -75,7 +75,6 @@ class Setpoint:
             msg.pose.orientation = Quaternion(*quaternion)
 
             self.pub.publish(msg)
-
             rate.sleep()
 
     def set(self, x, y, z, yaw, delay=0, wait=True):
@@ -85,12 +84,12 @@ class Setpoint:
         self.z = z
         self.yaw = yaw
 
-	rate = rospy.Rate(5)
+        #rate = rospy.Rate(5) #was not present in sample class
 
         if wait:
-            print "ran"
+            print self.curr_x, self.curr_y, self.curr_z
             rate = rospy.Rate(5)
-            while not self.done:
+            while not self.done and not rospy.is_shutdown():
                 rate.sleep()
 
         time.sleep(delay)
@@ -106,7 +105,11 @@ class Setpoint:
             rospy.logdebug("Position %s: local: %d, target: %d, abs diff: %d",
                            msg, x, y, abs(x - y))
             return abs(x - y) < 0.5
-
+        
+        self.curr_x = topic.pose.position.x
+        self.curr_y = topic.pose.position.y
+        self.curr_z = topic.pose.position.z 
+            
         if is_near('X', topic.pose.position.x, self.x) and \
            is_near('Y', topic.pose.position.y, self.y) and \
            is_near('Z', topic.pose.position.z, self.z):
@@ -114,10 +117,10 @@ class Setpoint:
             self.done_evt.set()
 
 
-    def _local_position_callback(self, topic):
-        self.curr_x = topic.pose.position.x
-        self.curr_y = topic.pose.position.y
-        self.curr_z = topic.pose.position.z
+    #def _local_position_callback(self, topic):
+    #    self.curr_x = topic.pose.position.x
+    #    self.curr_y = topic.pose.position.y
+    #    self.curr_z = topic.pose.position.z
 
     def set_rel(self, rel_x, rel_y, rel_z, rel_yaw, delay=0, wait=False):
         self.set(self.x+rel_x, self.y+rel_y, self.z+rel_z, self.yaw+rel_yaw, delay=delay, wait=wait)

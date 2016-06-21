@@ -58,17 +58,17 @@ rectR = np.zeros((640,480,3),np.uint8)
 prefiltercap = 0
 #test sliders for tuning SGBM
 cv2.createTrackbar('Pre-filter Cap','Depth Map',0,100,nothing)
-cv2.createTrackbar('minDisp*16','Depth Map',1,100,nothing)
-cv2.createTrackbar('numDisp*16','Depth Map',1,100,nothing)
-cv2.createTrackbar('UniquenessRatio','Depth Map',1,100,nothing)
-cv2.createTrackbar('SpeckleWinSize','Depth Map',1,100,nothing)
-cv2.createTrackbar('BlockSize','Depth Map',1,100,nothing)
-cv2.setTrackbarPos('Pre-filter Cap','Depth Map',1)
-cv2.setTrackbarPos('minDisp*16','Depth Map',1)
-cv2.setTrackbarPos('numDisp*16','Depth Map',1)
-cv2.setTrackbarPos('UniquenessRatio','Depth Map',1)
-cv2.setTrackbarPos('SpeckleWinSize','Depth Map',1)
-cv2.setTrackbarPos('BlockSize','Depth Map',1)
+#cv2.createTrackbar('minDisp*16','Depth Map',1,100,nothing)
+#cv2.createTrackbar('numDisp*16','Depth Map',1,100,nothing)
+#cv2.createTrackbar('UniquenessRatio','Depth Map',1,100,nothing)
+#cv2.createTrackbar('SpeckleWinSize','Depth Map',1,100,nothing)
+#cv2.createTrackbar('BlockSize','Depth Map',1,100,nothing)
+#cv2.setTrackbarPos('Pre-filter Cap','Depth Map',1)
+#cv2.setTrackbarPos('minDisp*16','Depth Map',1)
+#cv2.setTrackbarPos('numDisp*16','Depth Map',1)
+#cv2.setTrackbarPos('UniquenessRatio','Depth Map',1)
+#cv2.setTrackbarPos('SpeckleWinSize','Depth Map',1)
+#cv2.setTrackbarPos('BlockSize','Depth Map',1)
 
 exec_time_sum = 0
 i = 0

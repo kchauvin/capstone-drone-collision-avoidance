@@ -17,10 +17,11 @@ class Stereo_Vision:
         self.display_frames = display_frames
 
         # initialize windows
-	if self.display_frames == True:
-             cv2.namedWindow('Depth Map')
-             cv2.namedWindow('Threshold')
-             cv2.namedWindow('Shapes')
+self.quadrant_near_object = np.zeros((3,3), dtype=bool)
+
+        cv2.namedWindow('Depth Map')
+        cv2.namedWindow('Threshold')
+        cv2.namedWindow('Shapes')
 
 
         # import calibration matrices

@@ -20,19 +20,21 @@ from tf.transformations import quaternion_from_euler
 
 from Stereo_Vision import Stereo_Vision
 from MAVROS_navigation import Setpoint
-#from Usonic import usonic
+from Usonic import usonic
 
 mavros.set_namespace()
 
-
 #initialize sonar sensor network and vision system
 stereo = Stereo_Vision(cam_L_src=0,cam_R_src=1)
-#usonic = usonic(stuff)
+usonic = usonic(0x70, 5)
 
 #initailize ROS publisher for setpoints at 10Hz
 pub = rospy.Publisher('/mavros/setpoint_position/local', PoseStamped, queue_size=10)
 rospy.init_node('pose', anonymous=True)
 rate = rospy.Rate(10)
+print "Delaying for Vision System and Sonar to initialize"
+time.sleep(5)
+
 setpoint = Setpoint(pub, rospy, sonar_readings=usonic.readings)
 
 raw_input("Press any key to begin")
@@ -40,19 +42,18 @@ raw_input("Press any key to begin")
 
 setpoint.altitude_change(2)
 
-
 setpoint.pitch(5, wait=False, check_obs=True, sonar_readings=usonic.readings, store_final_dst = True)
 
 while not(setpoint.done or setpoint.obs_detected):
     if setpoint.obs_detected == True:   #sonar detected object along path and halted motion
         if not(stereo.object_left_column):
-            if usonic.readings[3] < 400:
+            if usonic.readings[3] < 500:
                 setpoint.roll(-2)
                 print "Rolling right"
-            elif usonic.readings[1] < 400:
+            elif usonic.readings[1] < 500:
                 setpoint.roll(2)
                 print "Rolling left"
-            elif usonic.readings[5] < 400:
+            elif usonic.readings[5] < 500:
                 setpoint.altitude_change(2)
                 "Increasing altitude 2m, left and right paths blocked"
             elif usonic.readings[2] < 400:

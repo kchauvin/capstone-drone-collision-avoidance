@@ -112,12 +112,12 @@ class Stereo_Vision:
 
                 self.rect = cv2.minAreaRect(self.contour_index)
                 self.box = cv2.boxPoints(self.rect)
-                #this needs to be fixed
                 self.box_area = abs((self.box[3][0] - self.box[0][0])) * abs((self.box[3][1] - self.box[0][1]))
                 self.box = np.int0(self.box)
 
                 if self.box_area > self.min_box_size:
-                    cv2.drawContours(self.disparity_contours, [self.box], 0, (0,255,0), 2)
+                    if self.display_frames == True:
+                        cv2.drawContours(self.disparity_contours, [self.box], 0, (0,255,0), 2)
 
                     #determine which quadrants the rectangle occupies
                     for corner_index in range(0,3):
@@ -127,19 +127,18 @@ class Stereo_Vision:
                             self.row= 2
                         self.quadrant_near_object[self.row][self.col] = True
 
-
-            if (self.quadrant_near_object[0][0] == True or self.quadrant_near_object[0][1] == True or self.quadrant_near_object[0][2] == True):
-                object_left_column = True
-            if (self.quadrant_near_object[1][0] == True or self.quadrant_near_object[1][1] == True or self.quadrant_near_object[1][2] == True):
-                object_mid_column = True
-            if (self.quadrant_near_object[2][0] == True or self.quadrant_near_object[2][1] == True or self.quadrant_near_object[2][2] == True):
-                object_right_column = True
-            if (self.quadrant_near_object[0][0] == True or self.quadrant_near_object[1][0] == True or self.quadrant_near_object[2][0] == True):
-                object_top_row = True
-            if (self.quadrant_near_object[0][1] == True or self.quadrant_near_object[1][1] == True or self.quadrant_near_object[2][1] == True):
-                object_mid_row = True
-            if (self.quadrant_near_object[0][2] == True or self.quadrant_near_object[1][2] == True or self.quadrant_near_object[2][2] == True):
-                object_bottom_row = True
+            if (self.quadrant_near_object[0][0] == False and self.quadrant_near_object[0][1] == False or self.quadrant_near_object[0][2] == False):
+                self.no_object_left_column = True
+            if (self.quadrant_near_object[1][0] == False and self.quadrant_near_object[1][1] == False and self.quadrant_near_object[1][2] == False):
+                self.no_object_mid_column = True
+            if (self.quadrant_near_object[2][0] == False and self.quadrant_near_object[2][1] == False and self.quadrant_near_object[2][2] == False):
+                self.no_object_right_column = True
+            if (self.quadrant_near_object[0][0] == False and self.quadrant_near_object[1][0] == False and self.quadrant_near_object[2][0] == False):
+                self.no_object_top_row = True
+            if (self.quadrant_near_object[0][1] == False and self.quadrant_near_object[1][1] == False and self.quadrant_near_object[2][1] == False):
+                self.no_object_mid_row = True
+            if (self.quadrant_near_object[0][2] == False and self.quadrant_near_object[1][2] == False and self.quadrant_near_object[2][2] == False):
+                self.no_object_bottom_row = True
 
             self.end_time = time.time()
             self.exec_time = self.end_time - self.start_time

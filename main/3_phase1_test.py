@@ -9,7 +9,6 @@ import mavros
 import numpy as np
 import imutils
 
-#from matplotlib import pyplot as plt
 from geometry_msgs.msg import PoseStamped, Quaternion
 from math import *
 from std_msgs.msg import Header
@@ -22,44 +21,38 @@ from threading import Thread, Event
 
 #from Stereo_Vision import Stereo_Vision
 from MAVROS_navigation import Setpoint
-#from Usonic import usonic
+from Stereo_Vision import Stereo_Vision
+from Usonic import usonic
+#stereo = Stereo_Vision(cam_L_src=0,cam_R_src=1)
+
+#initialize ultrasonic class and begin polling sensors
+usonic = usonic(0x70, 1, sim_mask = [False, True, True, True, True, True], sim_readings=[-1,100,600,600,600,600])
+usonic.start()
+time.sleep(2)
+print usonic.readings
 
 mavros.set_namespace()
 
-
-#initialize sonar sensor network and vision system
 #stereo = Stereo_Vision(cam_L_src=0,cam_R_src=1)
-#usonic = usonic(stuff)
 
 #initailize ROS publisher for setpoints at 10Hz
 rospy.init_node('setpoint_position_demo')
 mavros.set_namespace()  # initialize mavros module with default namespace
 rate = rospy.Rate(10)
-setpoint = Setpoint(sonar_readings=[500,500,500,500,500,500], jMAVSim = True)
+setpoint = Setpoint(sonar_readings=usonic.readings, jMAVSim = True, sen_threshold=100)
 
 raw_input("Press any key to begin")
 
-setpoint.altitude_change(515)
 print("Altitude up")
-setpoint.pitch(100, wait=False, check_obs=False, sonar_readings=[500,500,500,500,500], store_final = True)
+setpoint.altitude_change(2, wait=True)
+setpoint.pitch(50, wait=False, check_obs=True, store_final = True)
 
-raw_input("Press any key to halt")
-setpoint.halt()
+while setpoint.done == False and setpoint.obs_detected == False:
+    pass
 
-print "im dumb"
-#setpoint.yaw_ch(180)
-#setpoint.pitch(5, wait=False)
-#setpoint.yaw_ch(180)
+if setpoint.obs_detected == True:
+    print "Phase 1 complete"
+else:
+    print "Drone crashed"
 
-
-# setpoint.pitch(100,0)
-# time.sleep(1)
-# setpoint.halt()
-
-#print "Stopping Motion"
-#setpoint.roll(0,0)
-
-
-#setpoint.altitude_change(50)
-
-
+print "Mission complete"

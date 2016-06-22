@@ -17,13 +17,14 @@ from mavros import setpoint as SP
 
 class Setpoint:
 
-    def __init__(self, sonar_readings=[]):
+    def __init__(self, sonar_readings=[], jMAVSim=False, sen_threshold=250):
 
         self.x = 0.0
         self.y = 0.0
         self.z = 0.0
 
         self.yaw = 0.0
+	self.jMAVSim = jMAVSim
 
         # publisher for mavros/setpoint_position/local
         self.pub = SP.get_pub_position_local(queue_size=10)
@@ -32,13 +33,16 @@ class Setpoint:
                                     SP.PoseStamped, self.reached)
 
         try:
-            thread.start_new_thread( self.navigate, () )
+            #thread.start_new_thread( self.navigate, () )
+	    navigation_thread = threading.Thread(target=self.navigate)
+	    navigation_thread.start()
         except:
             print "Error: Unable to start thread"
                                     
                                     
-        #self.sonar_readings = sonar_readings
+        self.sonar_readings = sonar_readings
         self.obs_detected = False
+        self.sen_threshold = sen_threshold
         
         #current coordinates
         self.curr_x = 0.0
@@ -84,37 +88,42 @@ class Setpoint:
         self.z = z
         self.yaw = yaw
 
-        #rate = rospy.Rate(5) #was not present in sample class
+        rate = rospy.Rate(5) #was not present in sample class
 
         if wait:
-            print self.curr_x, self.curr_y, self.curr_z
-            rate = rospy.Rate(5)
-            while not self.done and not rospy.is_shutdown():
-                rate.sleep()
+            #rate = rospy.Rate(5)
+            while not self.done:
+		        print self.done
+		        rate.sleep()
 
         time.sleep(delay)
 
     def reached(self, topic):
-        #self.curr_x = topic.pose.position.x
-        #self.curr_y = topic.pose.position.y
-        #self.curr_z = topic.pose.position.z
         #if abs(topic.pose.position.x - self.x) < 0.5 and abs(topic.pose.position.y - self.y) < 0.5 and abs(topic.pose.position.z - self.z) < 0.5:
         #    self.done = True
         #self.done_evt.set()
         def is_near(msg, x, y):
             rospy.logdebug("Position %s: local: %d, target: %d, abs diff: %d",
                            msg, x, y, abs(x - y))
-            return abs(x - y) < 0.5
+            return abs(x - y) < 0.55
         
         self.curr_x = topic.pose.position.x
         self.curr_y = topic.pose.position.y
         self.curr_z = topic.pose.position.z 
-            
-        if is_near('X', topic.pose.position.x, self.x) and \
-           is_near('Y', topic.pose.position.y, self.y) and \
-           is_near('Z', topic.pose.position.z, self.z):
-            self.done = True
-            self.done_evt.set()
+        
+	#print is_near('X', topic.pose.position.x, self.x), is_near('Y', topic.pose.position.y, self.y)
+    	
+	if self.jMAVSim == False:
+	     if is_near('X', topic.pose.position.x, self.x) and \
+                is_near('Y', topic.pose.position.y, self.y) and \
+                is_near('Z', topic.pose.position.z, self.z):
+                self.done = True
+                self.done_evt.set()
+	else:
+             if is_near('X', topic.pose.position.x, self.x) and is_near('Y', topic.pose.position.y, self.y):
+                self.done = True
+                self.done_evt.set()
+
 
 
     #def _local_position_callback(self, topic):
@@ -125,7 +134,7 @@ class Setpoint:
     def set_rel(self, rel_x, rel_y, rel_z, rel_yaw, delay=0, wait=False):
         self.set(self.x+rel_x, self.y+rel_y, self.z+rel_z, self.yaw+rel_yaw, delay=delay, wait=wait)
 
-    def pitch(self, step, delay=0, wait=True, check_obs=False, sonar_readings = [], store_final=False):
+    def pitch(self, step, delay=0, wait=True, check_obs=False, store_final=False):
         new_x = self.x + step*cos(radians(self.yaw))
         new_y = self.y + step*sin(radians(self.yaw))
 
@@ -137,12 +146,12 @@ class Setpoint:
 
             while(self.done == False):  #check for obstacles along path until dest
                 if (step > 0):          #forward motion, check forward sonar sensor
-                    if (sonar_readings[0] < 200):
+                    if (self.sonar_readings[0] < self.sen_threshold):
                         self.halt()
                         print "Obstacle detected along path"
                         self.obs_detected = True
                 else:                   #backwards motion, check forward sonar sensor
-                    if (sonar_readings[2] < 200):
+                    if (self.sonar_readings[2] < self.sen_threshold):
                         self.halt()
                         print "Obstacle detected along path"
                         self.obs_detected = True
@@ -150,7 +159,7 @@ class Setpoint:
             self.set(new_x, new_y, self.z, self.yaw, delay, wait=wait) #set new setpoint
 
 
-    def roll(self, step, delay=0, wait=True, check_obs=False, sonar_readings = [], store_final=False):
+    def roll(self, step, delay=0, wait=True, check_obs=False, store_final=False):
         new_x = self.x + step*sin(radians(self.yaw))
         new_y = self.y + step*cos(-radians(self.yaw))
 
@@ -163,12 +172,12 @@ class Setpoint:
 
             while(self.done == False):  #check for obstacles along path until dest
                 if (step > 0):          #motion to the right, check right sonar sensor
-                    if (sonar_readings[1] < 200):
+                    if (self.sonar_readings[1] < self.sen_threshold):
                         self.halt()
                         print "Obstacle detected along path"
                         self.obs_detected = True
                 else:                   #motion to the left, check left sonar sensor
-                    if (sonar_readings[3] < 200):
+                    if (self.sonar_readings[3] < self.sen_threshold):
                         self.halt()
                         print "Obstacle detected along path"
                         self.obs_detected = True
@@ -181,7 +190,7 @@ class Setpoint:
         new_yaw = self.yaw + step
         self.set(self.x, self.y, self.z, new_yaw, delay, wait=wait)
 
-    def altitude_change(self,step, delay=0, wait=True, check_obs=False, sonar_readings = []):
+    def altitude_change(self,step, delay=0, wait=True, check_obs=False):
         new_z = self.z + step
 
         if check_obs == True:
@@ -189,17 +198,17 @@ class Setpoint:
 
             while(self.done == False):  #check for obstacles along path until dest
                 if (step > 0):          #motion to the right, check right sonar sensor
-                    if (sonar_readings[1] < 200):
+                    if (self.sonar_readings[1] < 200):
                         self.halt()
                         print "Obstacle detected along path"
                         self.obs_detected = True
                 else:                   #motion to the left, check left sonar sensor
-                    if (sonar_readings[3] < 200):
+                    if (self.sonar_readings[3] < 200):
                         self.halt()
                         print "Obstacle detected along path"
                         self.obs_detected = True
         else:
-            self.set(self.x, self.y, new_z, self.yaw, delay, wait=False) #set new setpoint
+            self.set(self.x, self.y, new_z, self.yaw, delay=delay, wait=wait) #set new setpoint
         #takeoff and land can use altitude_change function, simulator likes to set 0 at 25m, may need to subtract 25 from desired height
 
     def home(self, alt=0, delay=0, wait=True):
@@ -207,11 +216,9 @@ class Setpoint:
         #returns home and hovers at 2 m in the air
 
     def halt(self, delay=0):
-        #sub_localpos = rospy.Subscriber(mavros.get_topic('local_position', 'pose'), SP.PoseStamped, self._local_position_callback)
-        sub_localpos = rospy.Subscriber('/mavros/local_position/local', PoseStamped, self._local_position_callback)
         time.sleep(delay)
         print self.curr_x, self.curr_y, self.curr_z
-        self.set(self.curr_x, self.curr_y, self.curr_z, self.yaw)
+        self.set(self.curr_x, self.curr_y, self.z, self.yaw, wait=True)
 
     def store_final_dest(self, x, y, z, yaw):
         self.x_final_dest = x

@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/capstone-drone-collision-avoidance.iml" filepath="$PROJECT_DIR$/.idea/capstone-drone-collision-avoidance.iml" />
+      <module fileurl="file:$PROJECT_DIR$/../../..//$PROJECT_DIR$/.idea/capstone-drone-collision-avoidance.iml" filepath="$PROJECT_DIR$/.idea/capstone-drone-collision-avoidance.iml" />
+      <module fileurl="file:$PROJECT_DIR$/../../..////192.168.1.35/pihome/capstone-drone-collision-avoidance/.idea/capstone-drone-collision-avoidance.iml" filepath="192.168.1.35/..////192.168.1.35/pihome/capstone-drone-collision-avoidance/.idea/capstone-drone-collision-avoidance.iml" />
     </modules>
   </component>
 </project>

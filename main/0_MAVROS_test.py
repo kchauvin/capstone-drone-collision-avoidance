@@ -8,6 +8,7 @@ import threading
 import mavros
 import numpy as np
 import imutils
+import os
 
 from geometry_msgs.msg import PoseStamped, Quaternion
 from math import *
@@ -26,8 +27,7 @@ from Usonic import usonic
 #stereo = Stereo_Vision(cam_L_src=0,cam_R_src=1)
 
 #initialize ultrasonic class and begin polling sensors
-
-usonic = usonic(0x70, 1, disable_mask = [False, True, True, True, True, True], sim_readings=[-1,100,600,600,600,600], threshold = 100)
+usonic = usonic(0x70, 1, disable_mask = [False, True, True, True, True, True], sim_readings=[-1,100,600,600,600,600])
 usonic.start()
 time.sleep(2)
 print usonic.readings
@@ -40,24 +40,10 @@ mavros.set_namespace()
 rospy.init_node('setpoint_position_demo')
 mavros.set_namespace()  # initialize mavros module with default namespace
 rate = rospy.Rate(10)
-setpoint = Setpoint(sonar_obs_present=usonic.obs_present, jMAVSim = False)
+setpoint = Setpoint(jMAVSim = True)
 
-raw_input("Press any key to set home 1.5M above current location")
-
-setpoint.set_home(alt=1.5)
-
-raw_input("Press any key to begin")
-
-#print("Altitude up")
-#setpoint.altitude_change(520, wait=True)
-setpoint.pitch(10, wait=False, check_obs=True, store_final = True)
-
-while setpoint.done == False and setpoint.obs_detected == False:
-    pass
-
-if setpoint.obs_detected == True:
-    print "Obstacle detected"
-else:
-    print "Did not detect obstacle along path"
-
-print "Mission complete"
+while 1:
+	print "Curr X: %s" %setpoint.curr_x
+	print "Curr Y: %s" %setpoint.curr_y
+	print "Curr Z: %s" %setpoint.curr_z
+	os.system('clear')

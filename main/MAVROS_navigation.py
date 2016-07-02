@@ -11,20 +11,20 @@ from geometry_msgs.msg import PoseStamped, Quaternion
 from math import *
 from std_msgs.msg import Header
 from std_msgs.msg import String
-from tf.transformations import quaternion_from_euler
+from tf.transformations import quaternion_from_euler, euler_from_quaternion
 from mavros.utils import *
 from mavros import setpoint as SP
 
 class Setpoint:
 
-    def __init__(self, sonar_readings=[], jMAVSim=False, sen_threshold=250):
+    def __init__(self, sonar_obs_present=[], jMAVSim=False ):
 
         self.x = 0.0
         self.y = 0.0
         self.z = 0.0
 
         self.yaw = 0.0
-	self.jMAVSim = jMAVSim
+        self.jMAVSim = jMAVSim
 
         # publisher for mavros/setpoint_position/local
         self.pub = SP.get_pub_position_local(queue_size=10)
@@ -35,15 +35,14 @@ class Setpoint:
         try:
             #thread.start_new_thread( self.navigate, () )
 	    navigation_thread = threading.Thread(target=self.navigate)
-	    navigation_thread.start()
+            navigation_thread.start()
         except:
             print "Error: Unable to start thread"
                                     
                                     
-        self.sonar_readings = sonar_readings
+        self.sonar_obs_present = sonar_obs_present
         self.obs_detected = False
-        self.sen_threshold = sen_threshold
-        
+
         #current coordinates
         self.curr_x = 0.0
         self.curr_y = 0.0
@@ -93,8 +92,8 @@ class Setpoint:
         if wait:
             #rate = rospy.Rate(5)
             while not self.done:
-		        print self.done
-		        rate.sleep()
+                #print self.done
+                rate.sleep()
 
         time.sleep(delay)
 
@@ -109,10 +108,9 @@ class Setpoint:
         
         self.curr_x = topic.pose.position.x
         self.curr_y = topic.pose.position.y
-        self.curr_z = topic.pose.position.z 
+        self.curr_z = topic.pose.position.z
         
-	#print is_near('X', topic.pose.position.x, self.x), is_near('Y', topic.pose.position.y, self.y)
-    	
+
 	if self.jMAVSim == False:
 	     if is_near('X', topic.pose.position.x, self.x) and \
                 is_near('Y', topic.pose.position.y, self.y) and \
@@ -143,15 +141,16 @@ class Setpoint:
 
         if check_obs == True:
             self.set(new_x, new_y, self.z, self.yaw, delay, wait=False) #set new setpoint
+            time.sleep(0.1)
 
             while(self.done == False):  #check for obstacles along path until dest
                 if (step > 0):          #forward motion, check forward sonar sensor
-                    if (self.sonar_readings[0] < self.sen_threshold):
+                    if self.sonar_obs_present[0]:
                         self.halt()
                         print "Obstacle detected along path"
                         self.obs_detected = True
                 else:                   #backwards motion, check forward sonar sensor
-                    if (self.sonar_readings[2] < self.sen_threshold):
+                    if self.sonar_obs_present[2]:
                         self.halt()
                         print "Obstacle detected along path"
                         self.obs_detected = True
@@ -169,15 +168,15 @@ class Setpoint:
 
         if check_obs == True:
             self.set(new_x, new_y, self.z, self.yaw, delay, wait=False) #set new setpoint
-
+            time.sleep(0.1)
             while(self.done == False):  #check for obstacles along path until dest
                 if (step > 0):          #motion to the right, check right sonar sensor
-                    if (self.sonar_readings[1] < self.sen_threshold):
+                    if self.sonar_obs_present[1]:
                         self.halt()
                         print "Obstacle detected along path"
                         self.obs_detected = True
                 else:                   #motion to the left, check left sonar sensor
-                    if (self.sonar_readings[3] < self.sen_threshold):
+                    if self.sonar_obs_present[3]:
                         self.halt()
                         print "Obstacle detected along path"
                         self.obs_detected = True
@@ -195,23 +194,24 @@ class Setpoint:
 
         if check_obs == True:
             self.set(self.x, self.y, self.z, self.yaw, delay, wait=False) #set new setpoint
+            time.sleep(0.2)
 
             while(self.done == False):  #check for obstacles along path until dest
-                if (step > 0):          #motion to the right, check right sonar sensor
-                    if (self.sonar_readings[1] < 200):
+                if (step > 0):          #motion up, check top sonar sensor
+                    if self.sonar_obs_present[4]:
                         self.halt()
                         print "Obstacle detected along path"
                         self.obs_detected = True
-                else:                   #motion to the left, check left sonar sensor
-                    if (self.sonar_readings[3] < 200):
-                        self.halt()
-                        print "Obstacle detected along path"
-                        self.obs_detected = True
+                else:
+                    pass
         else:
             self.set(self.x, self.y, new_z, self.yaw, delay=delay, wait=wait) #set new setpoint
         #takeoff and land can use altitude_change function, simulator likes to set 0 at 25m, may need to subtract 25 from desired height
 
-    def home(self, alt=0, delay=0, wait=True):
+    def set_home(self, alt=2):
+        self.set(self.curr_x, self.curr_y, self.curr_z+alt, 0, wait=False)
+
+    def home(self, alt=2, delay=0, wait=True):
         self.set(0.0, 0.0, alt, 0.0, 0, wait=wait)
         #returns home and hovers at 2 m in the air
 

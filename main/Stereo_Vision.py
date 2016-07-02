@@ -88,7 +88,9 @@ class Stereo_Vision:
 
             #blur depth map to filter high frequency noise
             #disparity_gaussian = cv2.GaussianBlur(disparity,(9,9),0)
-            self.disparity_blur = cv2.medianBlur(self.disparity,11)
+            self.disparity_blur = cv2.medianBlur(self.disparity,13)
+
+            self.disparity_blur = cv2.copyMakeBorder(self.disparity_blur,top=2, bottom=2, right=2, left=2, borderType = cv2.BORDER_CONSTANT, value=0)
 
             #thresholding depth map
             self.disparity_thresh_near = cv2.threshold(self.disparity_blur,170,255,cv2.THRESH_BINARY)[1]
@@ -96,11 +98,12 @@ class Stereo_Vision:
             self.disparity_thresh_near = cv2.subtract(self.disparity_thresh_near, self.disparity_thresh_imm)
 
 
-            self.disparity_edge = cv2.Canny(self.disparity_thresh_imm,100,200)
+            #self.disparity_edge = cv2.Canny(self.disparity_thresh_imm,100,200)
+            self.disparity_edge = self.disparity_thresh_imm
 
             #contour finding
             #contours = cv2.findContours(disparity_thresh_imm, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[1]
-            self.contours = cv2.findContours(self.disparity_edge, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[1]
+            self.contours = cv2.findContours(self.disparity_edge, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[1]
 
             self.disparity_contours = np.zeros((480,640,3),np.uint8)
 
@@ -108,24 +111,24 @@ class Stereo_Vision:
             self.quadrant_near_object = np.zeros((3,3), dtype=bool)
 
             for self.contour_index in self.contours:
-                area = cv2.contourArea(self.contour_index)
+                self.contour_length = cv2.arcLength(self.contour_index, False)
+		if self.contour_length > 50:
+                	self.rect = cv2.minAreaRect(self.contour_index)
+                	self.box = cv2.boxPoints(self.rect)
+                	self.box_area = abs((self.box[3][0] - self.box[0][0])) * abs((self.box[3][1] - self.box[0][1]))
+                	self.box = np.int0(self.box)
 
-                self.rect = cv2.minAreaRect(self.contour_index)
-                self.box = cv2.boxPoints(self.rect)
-                self.box_area = abs((self.box[3][0] - self.box[0][0])) * abs((self.box[3][1] - self.box[0][1]))
-                self.box = np.int0(self.box)
+                	if self.box_area > self.min_box_size:
+                    		if self.display_frames == True:
+                        		cv2.drawContours(self.disparity_contours, [self.box], 0, (0,255,0), 2) #draw green box
 
-                if self.box_area > self.min_box_size:
-                    if self.display_frames == True:
-                        cv2.drawContours(self.disparity_contours, [self.box], 0, (0,255,0), 2)
-
-                    #determine which quadrants the rectangle occupies
-                    for corner_index in range(0,3):
-                        self.col = self.box[corner_index][0] / 214 # x coordinates
-                        self.row = self.box[corner_index][1] / 160 # y coordinates
-                        if self.row == 3:
-                            self.row= 2
-                        self.quadrant_near_object[self.row][self.col] = True
+                    	#determine which quadrants the rectangle occupies
+                    		for corner_index in range(0,3):
+                        		self.col = (self.box[corner_index][0] -70) / 190  # x coordinates
+                        		self.row = self.box[corner_index][1] / 160 # y coordinates
+                        		if self.row == 3:
+                            			self.row= 2
+                        		self.quadrant_near_object[self.row][self.col] = True
 
             if (self.quadrant_near_object[0][0] == False and self.quadrant_near_object[0][1] == False or self.quadrant_near_object[0][2] == False):
                 self.no_object_left_column = True
@@ -147,9 +150,10 @@ class Stereo_Vision:
             self.fps = 1.0 / self.exec_time
 
             if self.display_frames == True:
+	    	cv2.circle(self.disparity,(50,50), 25,(255,0,0), thickness=5)
                 cv2.drawContours(self.disparity_contours, self.contours, -1, (180,105,255), -1)
-                cv2.imshow('Threshold', self.disparity_thresh_imm)
-                cv2.imshow('Depth Map', self.disparity)
+                cv2.imshow('Threshold', self.disparity_edge)
+                cv2.imshow('Depth Map', self.disparity_blur)
                 cv2.imshow('Shapes', self.disparity_contours)
 
             if cv2.waitKey(1) & 0xFF == ord('q'):

@@ -44,7 +44,7 @@ class usonic:
 #		self.i2c.write_byte(old_addr,new_addr)
 		print "Address change successful"
 			
-usonic = usonic(0x70, 5, offset = 1, read_delay=0.1, sim_mask=[True, False, False, False, False, False], sim_readings = [234,0,0,0,0])	
+usonic = usonic(0x70, 4, offset = 1, read_delay=0.1, sim_mask=[False, False, False, False, False, False], sim_readings = [0,0,0,0,0])	
 
 usonic.start()
 time.sleep(1)
@@ -52,7 +52,6 @@ print usonic.readings
 time.sleep(0.5)
 while True:
 	print usonic.readings
-	time.sleep(1)
-	usonic.set_sim_reading(0,123)
+	time.sleep(0.1)
 		
 

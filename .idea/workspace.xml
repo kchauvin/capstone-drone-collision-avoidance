@@ -22,47 +22,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="3_phase1_test.py" pinned="false" current-in-tab="true">
-        <entry file="file:$PROJECT_DIR$/../../..//$PROJECT_DIR$/main/3_phase1_test.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="799">
-              <caret line="47" column="17" selection-start-line="47" selection-start-column="17" selection-end-line="47" selection-end-column="17" />
-              <folding>
-                <element signature="e#0#12#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Usonic.py" pinned="false" current-in-tab="false">
-        <entry file="file:$PROJECT_DIR$/../../..//$PROJECT_DIR$/main/Usonic.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="612">
-              <caret line="36" column="0" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
-              <folding>
-                <element signature="e#0#11#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="MAVROS_navigation.py" pinned="false" current-in-tab="false">
-        <entry file="file:$PROJECT_DIR$/../../..//$PROJECT_DIR$/main/MAVROS_navigation.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="415">
-              <caret line="187" column="0" selection-start-line="187" selection-start-column="0" selection-end-line="187" selection-end-column="0" />
-              <folding>
-                <element signature="e#0#12#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="4_phase2_test.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="4_phase2_test.py" pinned="false" current-in-tab="true">
         <entry file="file:$PROJECT_DIR$/../../..//$PROJECT_DIR$/main/4_phase2_test.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="208">
-              <caret line="26" column="61" selection-start-line="26" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
+            <state relative-caret-position="459">
+              <caret line="27" column="24" selection-start-line="27" selection-start-column="24" selection-end-line="27" selection-end-column="24" />
               <folding>
                 <element signature="e#0#12#0" expanded="true" />
               </folding>
@@ -95,12 +59,15 @@
         <option value="$PROJECT_DIR$/stereo_vision/stereo_analysis/rpi_algo_quick_test.py" />
         <option value="$PROJECT_DIR$/main/2_maintest1.py" />
         <option value="$PROJECT_DIR$/main/1_main_program.py" />
-        <option value="$PROJECT_DIR$/main/Stereo_Vision.py" />
-        <option value="$PROJECT_DIR$/main/4_phase2_test.py" />
         <option value="$PROJECT_DIR$/main/usonic.py" />
+        <option value="$PROJECT_DIR$/main/1a_stereo_class_test.py" />
+        <option value="$PROJECT_DIR$/main/Stereo_Vision.py" />
+        <option value="$PROJECT_DIR$/main/0_sonar_test.py" />
+        <option value="$PROJECT_DIR$/main/3_phase1_test.py" />
         <option value="$PROJECT_DIR$/main/Usonic.py" />
         <option value="$PROJECT_DIR$/main/MAVROS_navigation.py" />
-        <option value="$PROJECT_DIR$/main/3_phase1_test.py" />
+        <option value="$PROJECT_DIR$/main/5_phase3_test.py" />
+        <option value="$PROJECT_DIR$/main/4_phase2_test.py" />
       </list>
     </option>
   </component>
@@ -111,8 +78,10 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="width" value="1280" />
-    <option name="height" value="1400" />
+    <option name="x" value="-8" />
+    <option name="y" value="-8" />
+    <option name="width" value="2576" />
+    <option name="height" value="1416" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
     <OptionsSetting value="true" id="Add" />
@@ -140,7 +109,6 @@
     </navigator>
     <panes>
       <pane id="Scratches" />
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -151,6 +119,7 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -394,10 +363,10 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="1280" height="1400" extended-state="0" />
+    <frame x="-8" y="-8" width="2576" height="1416" extended-state="6" />
     <editor active="false" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.18908228" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.0828125" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -464,10 +433,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file:$PROJECT_DIR$/../../../192.168.1.35/pihome/capstone-drone-collision-avoidance/main/Stereo_Vision.py" />
-    <entry file="file:$PROJECT_DIR$/../../../192.168.1.35/pihome/capstone-drone-collision-avoidance/main/1_main_program.py" />
-    <entry file="file:$PROJECT_DIR$/../../../192.168.1.35/pihome/capstone-drone-collision-avoidance/stereo_vision/stereo_analysis/rpi_algo_quick_test.py" />
-    <entry file="file:$PROJECT_DIR$/../../../192.168.1.35/pihome/capstone-drone-collision-avoidance/main/MAVROS_navigation.py" />
     <entry file="file:$PROJECT_DIR$/../../../192.168.1.35/pihome/capstone-drone-collision-avoidance/navigation/3_navigation.py" />
     <entry file="file:$PROJECT_DIR$/../../../192.168.1.35/pihome/capstone-drone-collision-avoidance/main/Stereo_Vision.py" />
     <entry file="file:$PROJECT_DIR$/../../../192.168.1.35/pihome/capstone-drone-collision-avoidance/stereo_vision/stereo_analysis/testing/rectifytest.py" />
@@ -492,45 +457,32 @@
     <entry file="file:$PROJECT_DIR$/../../../192.168.1.35/pihome/capstone-drone-collision-avoidance/main/MAVROS_navigation.py" />
     <entry file="file:$PROJECT_DIR$/../../../192.168.1.35/pihome/capstone-drone-collision-avoidance/main/usonic.py" />
     <entry file="file:$PROJECT_DIR$/../../../192.168.1.35/pihome/capstone-drone-collision-avoidance/main/4_phase2_test.py" />
-    <entry file="file:$PROJECT_DIR$/../../..//$PROJECT_DIR$/main/4_phase2_test.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="208">
-          <caret line="26" column="61" selection-start-line="26" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#12#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:$PROJECT_DIR$/../../..//$PROJECT_DIR$/main/Usonic.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="612">
-          <caret line="36" column="0" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:$PROJECT_DIR$/../../..//$PROJECT_DIR$/main/MAVROS_navigation.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="415">
-          <caret line="187" column="0" selection-start-line="187" selection-start-column="0" selection-end-line="187" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#12#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:$PROJECT_DIR$/../../..//$PROJECT_DIR$/main/3_phase1_test.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="799">
-          <caret line="47" column="17" selection-start-line="47" selection-start-column="17" selection-end-line="47" selection-end-column="17" />
-          <folding>
-            <element signature="e#0#12#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file:$PROJECT_DIR$/../../../192.168.1.35/pihome/capstone-drone-collision-avoidance/main/4_phase2_test.py" />
+    <entry file="file:$PROJECT_DIR$/../../../192.168.1.35/pihome/capstone-drone-collision-avoidance/main/usonic.py" />
+    <entry file="file:$PROJECT_DIR$/../../../192.168.1.35/pihome/capstone-drone-collision-avoidance/main/MAVROS_navigation.py" />
+    <entry file="file:$PROJECT_DIR$/../../../192.168.1.35/pihome/capstone-drone-collision-avoidance/main/3_phase1_test.py" />
+    <entry file="file:$PROJECT_DIR$/../../../192.168.1.35/pihome/capstone-drone-collision-avoidance/main/Stereo_Vision.py" />
+    <entry file="file:$PROJECT_DIR$/../../../192.168.1.35/pihome/capstone-drone-collision-avoidance/main/1a_stereo_class_test.py" />
+    <entry file="file:$PROJECT_DIR$/../../../192.168.1.35/pihome/capstone-drone-collision-avoidance/main/Stereo_Vision.py" />
+    <entry file="file:$PROJECT_DIR$/../../../192.168.1.35/pihome/capstone-drone-collision-avoidance/main/MAVROS_navigation.py" />
+    <entry file="file:$PROJECT_DIR$/../../../192.168.1.35/pihome/capstone-drone-collision-avoidance/main/usonic.py" />
+    <entry file="file:$PROJECT_DIR$/../../../192.168.1.35/pihome/capstone-drone-collision-avoidance/main/MAVROS_navigation.py" />
+    <entry file="file:$PROJECT_DIR$/../../../192.168.1.35/pihome/capstone-drone-collision-avoidance/main/3_phase1_test.py" />
+    <entry file="file:$PROJECT_DIR$/../../../192.168.1.35/pihome/capstone-drone-collision-avoidance/main/0_sonar_test.py" />
+    <entry file="file:$PROJECT_DIR$/../../../192.168.1.35/pihome/capstone-drone-collision-avoidance/main/usonic.py" />
+    <entry file="file:$PROJECT_DIR$/../../../192.168.1.35/pihome/capstone-drone-collision-avoidance/main/3_phase1_test.py" />
+    <entry file="file:$PROJECT_DIR$/../../../192.168.1.35/pihome/capstone-drone-collision-avoidance/main/MAVROS_navigation.py" />
+    <entry file="file:$PROJECT_DIR$/../../../192.168.1.35/pihome/capstone-drone-collision-avoidance/main/4_phase2_test.py" />
+    <entry file="file:$PROJECT_DIR$/../../../192.168.1.35/pihome/capstone-drone-collision-avoidance/main/usonic.py" />
+    <entry file="file:$PROJECT_DIR$/../../../192.168.1.35/pihome/capstone-drone-collision-avoidance/main/3_phase1_test.py" />
+    <entry file="file:$PROJECT_DIR$/../../../192.168.1.35/pihome/capstone-drone-collision-avoidance/main/4_phase2_test.py" />
+    <entry file="file:$PROJECT_DIR$/../../../192.168.1.35/pihome/capstone-drone-collision-avoidance/main/3_phase1_test.py" />
+    <entry file="file:$PROJECT_DIR$/../../../192.168.1.35/pihome/capstone-drone-collision-avoidance/main/MAVROS_navigation.py" />
+    <entry file="file:$PROJECT_DIR$/../../../192.168.1.35/pihome/capstone-drone-collision-avoidance/main/4_phase2_test.py" />
+    <entry file="file:$PROJECT_DIR$/../../../192.168.1.35/pihome/capstone-drone-collision-avoidance/main/usonic.py" />
+    <entry file="file:$PROJECT_DIR$/../../../192.168.1.35/pihome/capstone-drone-collision-avoidance/main/4_phase2_test.py" />
+    <entry file="file:$PROJECT_DIR$/../../../192.168.1.35/pihome/capstone-drone-collision-avoidance/main/usonic.py" />
+    <entry file="file:$PROJECT_DIR$/../../../192.168.1.35/pihome/capstone-drone-collision-avoidance/main/MAVROS_navigation.py" />
+    <entry file="file:$PROJECT_DIR$/../../../192.168.1.35/pihome/capstone-drone-collision-avoidance/main/5_phase3_test.py" />
   </component>
 </project>

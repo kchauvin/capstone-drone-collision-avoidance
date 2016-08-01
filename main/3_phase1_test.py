@@ -27,7 +27,7 @@ from Usonic import usonic
 
 #initialize ultrasonic class and begin polling sensors
 
-usonic = usonic(0x70, 1, disable_mask = [False, True, True, True, True, True], sim_readings=[-1,100,600,600,600,600], threshold = 100)
+usonic = usonic(0x70, 1, disable_mask = [False, True, True, True, True, True], sim_readings=[-1,100,600,600,600,600], threshold=[300,500,500,500,500])
 usonic.start()
 time.sleep(2)
 print usonic.readings
@@ -48,8 +48,6 @@ setpoint.set_home(alt=1.5)
 
 raw_input("Press any key to begin")
 
-#print("Altitude up")
-#setpoint.altitude_change(520, wait=True)
 setpoint.pitch(10, wait=False, check_obs=True, store_final = True)
 
 while setpoint.done == False and setpoint.obs_detected == False:
@@ -61,3 +59,6 @@ else:
     print "Did not detect obstacle along path"
 
 print "Mission complete"
+
+time.sleep(5)
+setpoint.home()
